@@ -1,0 +1,21 @@
+{
+  "name": "jack-3d-creator-portfolio",
+  "version": "1.0.0",
+  "description": "Animated 3D Creator portfolio for Jack — built with HTML, CSS, Bootstrap 5, vanilla JavaScript, GSAP (ScrollTrigger) and AOS.",
+  "main": "index.html",
+  "scripts": {
+    "start": "lite-server",
+    "dev": "lite-server --port 5500"
+  },
+  "keywords": ["portfolio", "3d", "bootstrap", "gsap", "animation"],
+  "author": "Jack",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "gsap": "^3.12.5",
+    "aos": "^2.3.4"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
