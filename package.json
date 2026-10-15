@@ -1,7 +1,7 @@
 {
-  "name": "jack-3d-creator-portfolio",
+  "name": "syncak-3d-creator-portfolio",
   "version": "1.0.0",
-  "description": "Animated 3D Creator portfolio for Jack — built with HTML, CSS, Bootstrap 5, vanilla JavaScript, GSAP (ScrollTrigger) and AOS.",
+  "description": "Animated 3D Creator portfolio SyncAK — built with HTML, CSS, Bootstrap 5, vanilla JavaScript, GSAP (ScrollTrigger) and AOS.",
   "main": "index.html",
   "scripts": {
     "start": "lite-server",

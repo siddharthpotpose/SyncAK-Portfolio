@@ -357,3 +357,202 @@ document.addEventListener("keydown", function(e){
     }
 
 });
+
+
+// -------------------------------------------
+
+
+// 0-------------------------------------------
+
+
+
+const canInitFiniteCards =
+  typeof gsap !== 'undefined' &&
+  typeof ScrollTrigger !== 'undefined';
+
+if (canInitFiniteCards) {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const infiniteCardsSection = document.querySelector(".infinite-cards");
+
+if (infiniteCardsSection && canInitFiniteCards) {
+
+  const cardItems = gsap.utils.toArray(
+    ".infinite-cards__list li",
+    infiniteCardsSection
+  );
+
+  gsap.set(cardItems, {
+    xPercent: 400,
+    autoAlpha: 0,
+    scale: 0,
+    transformOrigin: "50% 50%"
+  });
+
+  const spacing = 0.12;
+  const cardDuration = 1;
+  const streamStart = cardDuration / 2;
+  const streamEnd = (cardItems.length - 1) * spacing + cardDuration / 2;
+
+  const cardsSequence = gsap.timeline({
+    paused: true,
+    defaults: {
+      ease: "none"
+    }
+  });
+
+  cardItems.forEach((card, index) => {
+    const cardStart = index * spacing;
+
+    cardsSequence.set(card, { zIndex: index + 1 }, cardStart);
+
+    cardsSequence
+      .fromTo(
+        card,
+        {
+          scale: 0,
+          autoAlpha: 0
+        },
+        {
+          scale: 1,
+          autoAlpha: 1,
+          zIndex: 100 + index,
+          duration: cardDuration / 2,
+          yoyo: true,
+          repeat: 1,
+          ease: "power1.in",
+          immediateRender: false
+        },
+        cardStart
+      )
+      .fromTo(
+        card,
+        {
+          xPercent: 400
+        },
+        {
+          xPercent: -400,
+          duration: cardDuration,
+          ease: "none",
+          immediateRender: false
+        },
+        cardStart
+      );
+  });
+
+  cardsSequence.time(streamStart);
+
+  const cardsTimeline = gsap.timeline({
+    defaults: {
+      ease: "none"
+    }
+  });
+
+  cardsTimeline.fromTo(
+    cardsSequence,
+    {
+      time: streamStart
+    },
+    {
+      time: streamEnd,
+      duration: 1,
+      immediateRender: true
+    }
+  );
+
+  function getInfiniteCardsScrollDistance() {
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    if (viewportWidth <= 420) {
+      return cardItems.length * Math.max(viewportHeight * 0.28, 170);
+    }
+
+    if (viewportWidth <= 767) {
+      return cardItems.length * Math.max(viewportHeight * 0.34, 220);
+    }
+
+    if (viewportWidth <= 1023) {
+      return cardItems.length * Math.max(viewportHeight * 0.48, 330);
+    }
+
+    return cardItems.length * Math.max(viewportHeight * 0.62, 460);
+  }
+
+  const trigger = ScrollTrigger.create({
+    trigger: infiniteCardsSection,
+    start: "top top",
+    end: () => `+=${getInfiniteCardsScrollDistance()}`,
+    animation: cardsTimeline,
+    pin: infiniteCardsSection,
+    scrub: 0.8,
+    invalidateOnRefresh: true,
+    anticipatePin: 1
+  });
+
+  const prevButton =
+    infiniteCardsSection.querySelector(
+      ".infinite-cards__btn--prev"
+    );
+
+  const nextButton =
+    infiniteCardsSection.querySelector(
+      ".infinite-cards__btn--next"
+    );
+
+  function getCurrentCardIndex() {
+    return gsap.utils.clamp(
+      0,
+      cardItems.length - 1,
+      Math.round((cardsSequence.time() - streamStart) / spacing)
+    );
+  }
+
+  function scrollToCard(index) {
+    const clampedIndex = gsap.utils.clamp(0, cardItems.length - 1, index);
+    const targetTime = clampedIndex * spacing + cardDuration / 2;
+    const progress = (targetTime - streamStart) / (streamEnd - streamStart);
+    const scrollTop =
+      trigger.start +
+      progress * (trigger.end - trigger.start);
+
+    window.scrollTo({
+      top: scrollTop,
+      behavior: "smooth"
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener("click", () => {
+      const currentIndex = getCurrentCardIndex();
+
+      if (currentIndex === cardItems.length - 1) {
+        window.scrollTo({
+          top: trigger.end + 2,
+          behavior: "smooth"
+        });
+        return;
+      }
+
+      scrollToCard(currentIndex + 1);
+    });
+  }
+
+  if (prevButton) {
+    prevButton.addEventListener("click", () => {
+      const currentIndex = getCurrentCardIndex();
+
+      if (currentIndex === 0) {
+        window.scrollTo({
+          top: trigger.start - 2,
+          behavior: "smooth"
+        });
+        return;
+      }
+
+      scrollToCard(currentIndex - 1);
+    });
+  }
+
+}
